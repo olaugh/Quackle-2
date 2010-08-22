@@ -1,3 +1,12 @@
+/*************************************************************
+ *
+ * Copyright (C) 2010 John O'Laughlin
+ *
+ * All rights reserved.
+ *
+ *************************************************************
+ */
+
 #include <fstream>
 #include <iostream>
 #include "layout.h"

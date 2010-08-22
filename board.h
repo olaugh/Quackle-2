@@ -1,3 +1,12 @@
+/*************************************************************
+ *
+ * Copyright (C) 2010 John O'Laughlin
+ *
+ * All rights reserved.
+ *
+ *************************************************************
+ */
+
 #ifndef BOARD_H
 #define BOARD_H
 
@@ -5,26 +14,25 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
+#include "layout.h"
 using namespace std;
-
-#define MAXIMUM_BOARD_SIZE 25
 
 class Board
 {
  public:
-    Board(int width, int height);
+    Board(int width, int height, Layout *layout);
 
     bool isEmpty();
 
  private:
-    int m_width;
-    int m_height;
-    bool m_empty;
+    int _width;
+    int _height;
+    Layout *_layout;
+    bool _empty;
 
     char m_letters[MAXIMUM_BOARD_SIZE][MAXIMUM_BOARD_SIZE];
-
 };
 
 ostream &operator<<(ostream &o, const Board &board);
+
 #endif

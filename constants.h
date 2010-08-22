@@ -1,3 +1,12 @@
+/*************************************************************
+ *
+ * Copyright (C) 2010 John O'Laughlin
+ *
+ * All rights reserved.
+ *
+ *************************************************************
+ */
+
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 

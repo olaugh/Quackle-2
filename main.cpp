@@ -1,8 +1,14 @@
+/*************************************************************
+ *
+ * Copyright (C) 2010 John O'Laughlin
+ *
+ * All rights reserved.
+ *
+ *************************************************************
+ */
+
 #include <iostream>
-
-#include "anagrammer.h"
-#include "board.h"
-
+#include "test.h"
 using namespace std;
 
 int main(int argc, char **argv) {
@@ -10,11 +16,8 @@ int main(int argc, char **argv) {
         cout << "usage: " << argv[0] << " foo" << endl;
         cout << "(will build subwords of foo)" << endl;
     } else {
-        Anagrammer a((char*)"twl.dawg");
-        Board b(15, 15);
-        for (int i = 0; i < 1; ++i) {
-            a.anagram(argv[1]);
-        }
+        Test::testAnagram(argv[1], 1);
+        Test::testBoard();
     }
     return 0;
 }

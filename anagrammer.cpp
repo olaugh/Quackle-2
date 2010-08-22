@@ -1,13 +1,18 @@
+/*************************************************************
+ *
+ * Copyright (C) 2010 John O'Laughlin
+ *
+ * All rights reserved.
+ *
+ *************************************************************
+ */
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <fstream>
 #include <iostream>
 #include "anagrammer.h"
 using namespace std;
-
-#define BLANK 26
-#define NUM_LETTERS 26
-#define NUM_TILES 27
 
 Anagrammer::Anagrammer(char* dict) {
     dawg = (const uint*)loadDawg(dict);
@@ -45,13 +50,11 @@ inline uint Anagrammer::getChild(const uint *dawg, uint nodeIndex, char c) {
     return dawg[nodeIndex + 1 + __builtin_popcount(bits & mask[n])];
 }
 
-inline bool
-Anagrammer::terminates(unsigned int node) {
+inline bool Anagrammer::terminates(unsigned int node) {
     return (node & 1) != 0;
 }
 
-inline unsigned int
-Anagrammer::getPointer(unsigned int node) {
+inline unsigned int Anagrammer::getPointer(unsigned int node) {
     return node >> 8;
 }
 

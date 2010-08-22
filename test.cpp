@@ -1,3 +1,12 @@
+/*************************************************************
+ *
+ * Copyright (C) 2010 John O'Laughlin
+ *
+ * All rights reserved.
+ *
+ *************************************************************
+ */
+
 #include <iostream>
 #include "test.h"
 using namespace std;
