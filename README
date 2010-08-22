@@ -1,0 +1,10 @@
+Quackle 2, by John O'Laughlin
+All rights reserved
+
+This isn't yet but will become experimental word finding code for use
+in word game software. My goal is for it to be very fast and simple.
+
+I haven't planned very far ahead but I'm starting to think that it
+would be better to separate word-finding from strategy, and in the
+future I might write strategy code in Haskell or some other language,
+calling this library via FFI.
