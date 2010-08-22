@@ -18,6 +18,8 @@ class Layout {
  public:
     Layout(char *filename);
 
+    void writeSquare(ostream &o, int row, int col);
+
  private:
     bool checkDimensions();
     bool readGrid(ifstream &file);

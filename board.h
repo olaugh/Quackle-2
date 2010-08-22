@@ -22,17 +22,24 @@ class Board
  public:
     Board(int width, int height, Layout *layout);
 
+    void clear();
     bool isEmpty();
-
+    void writeColumnHeaders(ostream &o);
+    void writeHorizontalLine(ostream &o);
+    void writeRows(ostream &o);
+    void writeRow(ostream &o, int row);
+    void writeLetter(ostream &o, int row, int col);
+    void writeSquare(ostream &o, int row, int col);
+    
  private:
     int _width;
     int _height;
     Layout *_layout;
     bool _empty;
 
-    char m_letters[MAXIMUM_BOARD_SIZE][MAXIMUM_BOARD_SIZE];
+    char _letters[MAXIMUM_BOARD_SIZE][MAXIMUM_BOARD_SIZE];
 };
 
-ostream &operator<<(ostream &o, const Board &board);
+ostream &operator<<(ostream &o, Board &board);
 
 #endif

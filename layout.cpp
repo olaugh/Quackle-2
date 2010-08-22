@@ -84,4 +84,20 @@ bool Layout::readGrid(ifstream &file) {
     return true;
 }
             
-            
+void Layout::writeSquare(ostream &o, int row, int col) {
+    char square = ' ';
+    if (_lMul[row][col] > 1) {
+        switch(_lMul[row][col]) {
+        case 2: square = '\''; break;
+        case 3: square = '"'; break;
+        case 4: square = '^'; break;
+        }
+    } else {
+        switch(_wMul[row][col]) {
+        case 2: square = '-'; break;
+        case 3: square = '='; break;
+        case 4: square = '#'; break;
+        }
+    }
+    o << square;
+}
