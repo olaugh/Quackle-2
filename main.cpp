@@ -21,6 +21,7 @@ int main(int argc, char **argv) {
     }
     */
 
-    Test::testBoard();
+    //Test::testBoard();
+    Test::testMove();
     return 0;
 }

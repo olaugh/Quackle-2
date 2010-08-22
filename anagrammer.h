@@ -10,7 +10,9 @@
 #ifndef ANAGRAMMER_H
 #define ANAGRAMMER_H
 
+#include "board.h"
 #include "constants.h"
+#include "move.h"
 #include "types.h"
 
 class Anagrammer

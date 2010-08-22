@@ -7,22 +7,20 @@
  *************************************************************
  */
 
-#ifndef TEST_H
-#define TEST_H
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <iostream>
-#include "anagrammer.h"
-#include "board.h"
 #include "constants.h"
-#include "layout.h"
+#include "types.h"
 using namespace std;
 
-class Test
+class Util
 {
  public:
-    static void testAnagram(char *input, int times);
-    static void testBoard();
-    static void testMove();
+    static void writeBlankLetter(ostream &o, uchar letter);
+    static void writeLetter(ostream &o, uchar letter);
+    static void writeTile(ostream &o, uchar tile);
 };
 
 #endif
