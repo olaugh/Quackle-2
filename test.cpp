@@ -32,3 +32,9 @@ void Test::testMove() {
     cout << exch << endl;
     cout << place << endl;
 }
+
+void Test::testRack() {
+    uchar rucksexTiles[7] = {18, 21, 3, 11, 19, 5, 24};
+    Rack rucksex(7, rucksexTiles);
+    cout << rucksex << endl;
+}

@@ -1,5 +1,5 @@
 CXX = g++
-OBJS = main.o anagrammer.o board.o layout.o move.o test.o util.o
+OBJS = main.o anagrammer.o board.o layout.o move.o rack.o test.o util.o
 
 test : $(OBJS)
 	$(CXX) $(DEBUG) -o test $(OBJS)
@@ -19,7 +19,10 @@ layout.o : layout.cpp constants.h types.h layout.h
 move.o : move.cpp constants.h types.h move.h util.h
 	$(CXX) $(DEBUG) -c move.cpp
 
-test.o : test.cpp anagrammer.h constants.h layout.h test.h types.h 
+rack.o : rack.cpp constants.h types.h rack.h util.h
+	$(CXX) $(DEBUG) -c rack.cpp
+
+test.o : test.cpp anagrammer.h constants.h layout.h rack.h test.h types.h 
 	$(CXX) $(DEBUG) -c test.cpp
 
 clean :

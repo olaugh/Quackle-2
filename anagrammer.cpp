@@ -96,6 +96,9 @@ inline int Anagrammer::countTiles(const char *input, uint *counts) {
     return validChars;
 }
 
+void Anagrammer::findMoves(const Board &board, const Rack rack) {
+}
+
 void Anagrammer::anagram(const char *input) {
     uint counts[BLANK + 1];
     uint validChars = countTiles(input, counts);

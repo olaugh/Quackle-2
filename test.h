@@ -23,6 +23,7 @@ class Test
     static void testAnagram(const char *input, int times);
     static void testBoard();
     static void testMove();
+    static void testRack();
 };
 
 #endif

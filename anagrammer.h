@@ -14,6 +14,7 @@
 #include "constants.h"
 #include "move.h"
 #include "types.h"
+#include "rack.h"
 #include "util.h"
 
 class Anagrammer
@@ -21,6 +22,7 @@ class Anagrammer
  public:
     Anagrammer(const char* dict);
     void anagram(const char* input);
+    void findMoves(const Board &board, const Rack rack);
 
  private:
     uint mask[32];
