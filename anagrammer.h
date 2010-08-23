@@ -14,11 +14,12 @@
 #include "constants.h"
 #include "move.h"
 #include "types.h"
+#include "util.h"
 
 class Anagrammer
 {
  public:
-    Anagrammer(char* dict);
+    Anagrammer(const char* dict);
     void anagram(const char* input);
 
  private:
@@ -35,7 +36,7 @@ class Anagrammer
     inline bool skipAhead(uchar *perm, int start);
     inline int countTiles(const char *input, uint *counts);
 
-    const unsigned int* loadDawg(char *filename);
+    const unsigned int* loadDawg(const char *filename);
     void computeMasks();
 };
 

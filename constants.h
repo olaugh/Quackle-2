@@ -15,7 +15,9 @@
 #define MAXIMUM_BOARD_SIZE 25
 
 #define EMPTY_SQUARE 0
-#define BLANK 26
+#define FIRST_LETTER 1
+#define LAST_LETTER 26
+#define BLANK 27
 #define NUM_LETTERS 26
 #define NUM_TILES 27
 

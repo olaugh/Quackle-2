@@ -37,7 +37,7 @@ void Node::write(ofstream& out) {
     unsigned int bits = 0;
     for (int i = 0; i < children.size(); ++i) {
         //cout << children[i].c;
-        unsigned int b = children[i].c - 'A';
+        unsigned int b = children[i].c + 1 - 'A';
         bits |= (1 << b); 
     }
     //cout << endl;
@@ -54,8 +54,8 @@ void Node::write(ofstream& out) {
         //cout << "child " << children[i].c << " has index " << p << endl;
         const unsigned char childBytes[4] = {
             children[i].t ? 1 : 0,
-            (p & 0x000000FF) >>  0,
-            (p & 0x0000FF00) >>  8,
+            (p & 0x000000FF) >> 0,
+            (p & 0x0000FF00) >> 8,
             (p & 0x00FF0000) >> 16
         };
         out.write((const char*)childBytes, 4);

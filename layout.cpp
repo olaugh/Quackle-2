@@ -13,7 +13,7 @@
 #include "board.h"
 using namespace std;
 
-Layout::Layout(char* filename) {
+Layout::Layout(const char* filename) {
     _valid = true;
     string by; // dummy
     ifstream file(filename);

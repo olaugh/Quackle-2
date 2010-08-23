@@ -20,7 +20,7 @@ using namespace std;
 class Test
 {
  public:
-    static void testAnagram(char *input, int times);
+    static void testAnagram(const char *input, int times);
     static void testBoard();
     static void testMove();
 };

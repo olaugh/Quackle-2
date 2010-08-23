@@ -16,7 +16,7 @@ using namespace std;
 
 class Layout {
  public:
-    Layout(char *filename);
+    Layout(const char *filename);
 
     void writeSquare(ostream &o, int row, int col);
 

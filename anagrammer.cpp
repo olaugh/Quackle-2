@@ -14,39 +14,25 @@
 #include "anagrammer.h"
 using namespace std;
 
-Anagrammer::Anagrammer(char* dict) {
+Anagrammer::Anagrammer(const char* dict) {
     dawg = (const uint*)loadDawg(dict);
     computeMasks();
 }
 
-// convert an index into the tileset into a tile character
-inline char Anagrammer::toChar(uint index) {
-    if (index == BLANK) return '?';
-    return index + 'A';
-}
-
-inline void Anagrammer::printLowercase(uchar *perm, int length) {
-    for (int i = 0; i < length; ++i) {
-        char c = perm[i] - 'A' + 'a';
-        cout << c;
-    }
-    cout << endl;
-}
-
 inline void Anagrammer::printTruncated(uchar *permutation, int length) {
-    for (int i = 0; i < length; ++i) cout << permutation[i];
+    for (int i = 0; i < length; ++i) Util::writeTile(cout, permutation[i]);
     cout << endl;
 }
 
 inline bool Anagrammer::hasChild(const uint *dawg, uint nodeIndex, uchar c) {
     uint bits = dawg[nodeIndex];
-    uint bit = 1 << (c - 'A');
+    uint bit = 1 << c;
     return (bits & bit) != 0;
 }
 
 inline uint Anagrammer::getChild(const uint *dawg, uint nodeIndex, char c) {
     uint bits = dawg[nodeIndex];
-    uint n = c - 'A';
+    uint n = c;
     return dawg[nodeIndex + 1 + __builtin_popcount(bits & mask[n])];
 }
 
@@ -84,7 +70,7 @@ inline bool Anagrammer::skipAhead(uchar *perm, int start) {
 
 inline int Anagrammer::countTiles(const char *input, uint *counts) {
     uint validChars = 0;
-    for (int i = 0; i < NUM_TILES; i++) counts[i] = 0;
+    for (int i = 0; i <= BLANK; i++) counts[i] = 0;
 
     for (const char* p = input; p[0] != '\0'; ++p) {
         char c = p[0];
@@ -92,9 +78,9 @@ inline int Anagrammer::countTiles(const char *input, uint *counts) {
         bool valid = true;
 
         if ((c >= 'a') && (c <= 'z')) {
-            i = c - 'a';
+            i = c + FIRST_LETTER - 'a';
         } else if ((c >= 'A') && (c <= 'Z')) {
-            i = c - 'A';
+            i = c + FIRST_LETTER - 'A';
         } else if ((c == '?') || (c == '.')) {
             i = BLANK;
         } else {
@@ -111,7 +97,7 @@ inline int Anagrammer::countTiles(const char *input, uint *counts) {
 }
 
 void Anagrammer::anagram(const char *input) {
-    uint counts[NUM_TILES];
+    uint counts[BLANK + 1];
     uint validChars = countTiles(input, counts);
     if (!validChars) {
         cout << "no valid input" << endl;
@@ -123,11 +109,8 @@ void Anagrammer::anagram(const char *input) {
     // L1. [Visit a_1,a_2...a_n]
     uchar *perm = new uchar[validChars + 1];
     uint index = 0;
-    for (int tile = 0; tile < NUM_TILES; ++tile) {
-        for (int j = 0; j < counts[tile]; ++j) {
-            perm[index++] = toChar(tile);
-        }
-    }
+    for (int tile = 0; tile < NUM_TILES; ++tile)
+        for (int j = 0; j < counts[tile]; ++j) perm[index++] = tile;
     perm[index] = '\0';
 
     uint *nodes = new unsigned int[validChars];
@@ -189,7 +172,7 @@ void Anagrammer::anagram(const char *input) {
     }
 }
 
-const uint* Anagrammer::loadDawg(char *filename) {
+const uint* Anagrammer::loadDawg(const char *filename) {
     ifstream file(filename);
 
     char fileType[5];
