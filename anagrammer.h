@@ -25,17 +25,17 @@ class Anagrammer
     void findMoves(const Board &board, const Rack rack);
 
  private:
-    uint mask[32];
-    const uint *dawg;
+    uint _mask[32];
+    const uint *_dawg;
+    uchar _perm[MAXIMUM_RACK_SIZE + 1];
 
     inline char toChar(unsigned int index);
-    inline void printLowercase(uchar *perm, int length);
-    inline void printTruncated(uchar *permutation, int length);
-    inline bool hasChild(const uint *dawg, uint nodeIndex, uchar c);
-    inline unsigned int getChild(const uint *dawg, uint nodeIndex, char c);
+    inline void printTruncated(int length);
+    inline bool hasChild(uint nodeIndex, uchar c);
+    inline unsigned int getChild(uint nodeIndex, char c);
     inline bool terminates(uint node);
     inline unsigned int getPointer(uint node);
-    inline bool skipAhead(uchar *perm, int start);
+    inline bool skipAhead(int start);
     inline int countTiles(const char *input, uint *counts);
 
     const unsigned int* loadDawg(const char *filename);

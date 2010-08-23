@@ -15,25 +15,25 @@
 using namespace std;
 
 Anagrammer::Anagrammer(const char* dict) {
-    dawg = (const uint*)loadDawg(dict);
+    _dawg = loadDawg(dict);
     computeMasks();
 }
 
-inline void Anagrammer::printTruncated(uchar *permutation, int length) {
-    for (int i = 0; i < length; ++i) Util::writeTile(cout, permutation[i]);
+inline void Anagrammer::printTruncated(int length) {
+    for (int i = 0; i < length; ++i) Util::writeTile(cout, _perm[i]);
     cout << endl;
 }
 
-inline bool Anagrammer::hasChild(const uint *dawg, uint nodeIndex, uchar c) {
-    uint bits = dawg[nodeIndex];
+inline bool Anagrammer::hasChild(uint nodeIndex, uchar c) {
+    uint bits = _dawg[nodeIndex];
     uint bit = 1 << c;
     return (bits & bit) != 0;
 }
 
-inline uint Anagrammer::getChild(const uint *dawg, uint nodeIndex, char c) {
-    uint bits = dawg[nodeIndex];
+inline uint Anagrammer::getChild(uint nodeIndex, char c) {
+    uint bits = _dawg[nodeIndex];
     uint n = c;
-    return dawg[nodeIndex + 1 + __builtin_popcount(bits & mask[n])];
+    return _dawg[nodeIndex + 1 + __builtin_popcount(bits & _mask[n])];
 }
 
 inline bool Anagrammer::terminates(unsigned int node) {
@@ -44,21 +44,21 @@ inline unsigned int Anagrammer::getPointer(unsigned int node) {
     return node >> 8;
 }
 
-inline bool Anagrammer::skipAhead(uchar *perm, int start) {
-    for (int i = start + 1; perm[i] != '\0'; ++i) {
-        if (perm[i] > perm[start]) {
-            swap(perm[start], perm[i]);
+inline bool Anagrammer::skipAhead(int start) {
+    for (int i = start + 1; _perm[i] != '\0'; ++i) {
+        if (_perm[i] > _perm[start]) {
+            swap(_perm[start], _perm[i]);
             return true;
         }
     }
  
-    char temp = perm[start];
+    char temp = _perm[start];
     int numOfTemp = 1;
-    for (uchar* dupPtr = perm + start + 1; dupPtr[0] == temp; ++dupPtr) {
+    for (uchar* dupPtr = _perm + start + 1; dupPtr[0] == temp; ++dupPtr) {
         ++numOfTemp;
     }
 
-    uchar* cyclePtr = perm + start;
+    uchar* cyclePtr = _perm + start;
     while (cyclePtr[numOfTemp] != '\0') {
         cyclePtr[0] = cyclePtr[numOfTemp];
         ++cyclePtr;
@@ -110,11 +110,10 @@ void Anagrammer::anagram(const char *input) {
     /* This is an implementation of Algorithm L (Lexicographic permutation
        generation) from Knuth's TAOCP Volume 4, Chapter 7.2.1.2. */
     // L1. [Visit a_1,a_2...a_n]
-    uchar *perm = new uchar[validChars + 1];
     uint index = 0;
     for (int tile = 0; tile < NUM_TILES; ++tile)
-        for (int j = 0; j < counts[tile]; ++j) perm[index++] = tile;
-    perm[index] = '\0';
+        for (int j = 0; j < counts[tile]; ++j) _perm[index++] = tile;
+    _perm[index] = '\0';
 
     uint *nodes = new unsigned int[validChars];
     nodes[0] = 0;
@@ -123,9 +122,9 @@ void Anagrammer::anagram(const char *input) {
     for (;;) {
         if (newestPrefixLen <= skipUntilNewAt + 1) {
             for (int i = newestPrefixLen; i <= validChars; ++i) {
-                if (hasChild(dawg, nodes[i - 1], perm[i - 1])) {
-                    uint child = getChild(dawg, nodes[i - 1], perm[i - 1]);
-                    if (terminates(child)) printTruncated(perm, i);
+                if (hasChild(nodes[i - 1], _perm[i - 1])) {
+                    uint child = getChild(nodes[i - 1], _perm[i - 1]);
+                    if (terminates(child)) printTruncated(i);
                     unsigned int newNode = getPointer(child);
                     nodes[i] = newNode;
                     if (!newNode) {
@@ -141,9 +140,8 @@ void Anagrammer::anagram(const char *input) {
 
         // L2. [Find j]
         int j = validChars - 2;
-        while (perm[j] >= perm[j + 1]) {
+        while (_perm[j] >= _perm[j + 1]) {
             if (j == 0) {
-                delete perm;
                 delete nodes;
                 return;
             }
@@ -151,9 +149,8 @@ void Anagrammer::anagram(const char *input) {
         }
 
         if (j > skipUntilNewAt) {
-            while (!skipAhead(perm, skipUntilNewAt)) {
+            while (!skipAhead(skipUntilNewAt)) {
                 if (!skipUntilNewAt) {
-                    delete perm;
                     delete nodes;
                     return;
                 }
@@ -163,14 +160,14 @@ void Anagrammer::anagram(const char *input) {
         } else {
             // L3. [Increase a_j]
             int l = validChars - 1;
-            while (perm[j] >= perm[l]) --l;
-            swap(perm[j], perm[l]);
+            while (_perm[j] >= _perm[l]) --l;
+            swap(_perm[j], _perm[l]);
             newestPrefixLen = j + 1;
 
             // L4. [Reverse a_j+1.,.a_n]
             int r0 = j + 1;
             int r1 = validChars - 1;
-            while (r0 < r1) swap(perm[r0++], perm[r1--]);
+            while (r0 < r1) swap(_perm[r0++], _perm[r1--]);
         }
     }
 }
@@ -193,6 +190,6 @@ const uint* Anagrammer::loadDawg(const char *filename) {
 }
 
 void Anagrammer::computeMasks() {
-    mask[0] = 0;
-    for (int i = 1; i < 32; ++i) mask[i] = 0xFFFFFFFF >> (32 - i);
+    _mask[0] = 0;
+    for (int i = 1; i < 32; ++i) _mask[i] = 0xFFFFFFFF >> (32 - i);
 }
