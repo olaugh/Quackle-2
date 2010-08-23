@@ -10,12 +10,14 @@
 #ifndef ANAGRAMMER_H
 #define ANAGRAMMER_H
 
+#include <vector>
 #include "board.h"
 #include "constants.h"
 #include "move.h"
 #include "types.h"
 #include "rack.h"
 #include "util.h"
+using namespace std;
 
 class Anagrammer
 {
@@ -28,6 +30,8 @@ class Anagrammer
     uint _mask[32];
     const uint *_dawg;
     uchar _perm[MAXIMUM_RACK_SIZE + 1];
+    uint _nodes[MAXIMUM_RACK_SIZE + 1];
+    vector<Move> moves;
 
     inline char toChar(unsigned int index);
     inline void printTruncated(int length);
@@ -37,6 +41,7 @@ class Anagrammer
     inline unsigned int getPointer(uint node);
     inline bool skipAhead(int start);
     inline int countTiles(const char *input, uint *counts);
+    inline uint setFirstPerm(const char *input);
 
     const unsigned int* loadDawg(const char *filename);
     void computeMasks();

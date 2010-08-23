@@ -24,6 +24,7 @@ class Test
     static void testBoard();
     static void testMove();
     static void testRack();
+    static void testOpener();
 };
 
 #endif

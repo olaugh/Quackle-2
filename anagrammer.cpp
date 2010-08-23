@@ -96,15 +96,12 @@ inline int Anagrammer::countTiles(const char *input, uint *counts) {
     return validChars;
 }
 
-void Anagrammer::findMoves(const Board &board, const Rack rack) {
-}
-
-void Anagrammer::anagram(const char *input) {
+uint Anagrammer::setFirstPerm(const char *input) {
     uint counts[BLANK + 1];
     uint validChars = countTiles(input, counts);
     if (!validChars) {
         cout << "no valid input" << endl;
-        return;
+        return 0;
     }
 
     /* This is an implementation of Algorithm L (Lexicographic permutation
@@ -115,18 +112,28 @@ void Anagrammer::anagram(const char *input) {
         for (int j = 0; j < counts[tile]; ++j) _perm[index++] = tile;
     _perm[index] = '\0';
 
-    uint *nodes = new unsigned int[validChars];
-    nodes[0] = 0;
+    return validChars;
+}
+
+void Anagrammer::findMoves(const Board &board, const Rack rack) {
+
+}
+
+void Anagrammer::anagram(const char *input) {
+    int validChars = setFirstPerm(input);
+    if (!validChars) return;
+    _nodes[0] = 0;
+
     uint newestPrefixLen = 1;
     uint skipUntilNewAt = 1;
     for (;;) {
         if (newestPrefixLen <= skipUntilNewAt + 1) {
             for (int i = newestPrefixLen; i <= validChars; ++i) {
-                if (hasChild(nodes[i - 1], _perm[i - 1])) {
-                    uint child = getChild(nodes[i - 1], _perm[i - 1]);
+                if (hasChild(_nodes[i - 1], _perm[i - 1])) {
+                    uint child = getChild(_nodes[i - 1], _perm[i - 1]);
                     if (terminates(child)) printTruncated(i);
                     unsigned int newNode = getPointer(child);
-                    nodes[i] = newNode;
+                    _nodes[i] = newNode;
                     if (!newNode) {
                         skipUntilNewAt = i - 1;
                         break;
@@ -141,19 +148,13 @@ void Anagrammer::anagram(const char *input) {
         // L2. [Find j]
         int j = validChars - 2;
         while (_perm[j] >= _perm[j + 1]) {
-            if (j == 0) {
-                delete nodes;
-                return;
-            }
+            if (j == 0) return;
             --j;
         }
 
         if (j > skipUntilNewAt) {
             while (!skipAhead(skipUntilNewAt)) {
-                if (!skipUntilNewAt) {
-                    delete nodes;
-                    return;
-                }
+                if (!skipUntilNewAt) return;
                 --skipUntilNewAt;
             }
             newestPrefixLen = skipUntilNewAt + 1;

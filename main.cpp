@@ -16,5 +16,6 @@ int main(int argc, char **argv) {
     //Test::testBoard();
     //Test::testMove();
     //Test::testRack();
+    Test::testOpener();
     return 0;
 }

@@ -38,3 +38,12 @@ void Test::testRack() {
     Rack rucksex(7, rucksexTiles);
     cout << rucksex << endl;
 }
+
+void Test::testOpener() {
+    Layout standard("standard.qly");
+    Board empty(15, 15, &standard);
+    uchar rucksexTiles[7] = {18, 21, 3, 11, 19, 5, 24};
+    Rack rucksex(7, rucksexTiles);
+    Anagrammer a("twl.dawg");
+    a.findMoves(empty, rucksex);
+}
