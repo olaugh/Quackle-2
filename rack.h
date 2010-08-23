@@ -21,6 +21,7 @@ class Rack {
 
     void writeTiles(ostream &o);
     void writeEmpties(ostream &o);
+    inline uint len() const { return _len; }
 
  private:
     void writeTile(ostream &o, uint idx);

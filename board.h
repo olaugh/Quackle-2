@@ -20,10 +20,11 @@ using namespace std;
 class Board
 {
  public:
-    Board(int width, int height, Layout *layout);
+    Board(int width, int height, const Layout *layout);
 
     void clear();
-    bool isEmpty();
+    inline bool isEmpty() const { return _empty; }
+    inline const Layout* layout() const { return _layout; }
     void writeColumnHeaders(ostream &o);
     void writeHorizontalLine(ostream &o);
     void writeRows(ostream &o);
@@ -34,7 +35,7 @@ class Board
  private:
     int _width;
     int _height;
-    Layout *_layout;
+    const Layout *_layout;
     bool _empty;
 
     char _letters[MAXIMUM_BOARD_SIZE][MAXIMUM_BOARD_SIZE];

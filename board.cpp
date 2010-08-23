@@ -15,15 +15,11 @@
 #include "board.h"
 using namespace std;
 
-Board::Board(int width, int height, Layout *layout) {
+Board::Board(int width, int height, const Layout *layout) {
     _width = width;
     _height = height;
     _layout = layout;
     clear();
-}
-
-inline bool Board::isEmpty() {
-    return _empty;
 }
 
 inline void Board::clear() {

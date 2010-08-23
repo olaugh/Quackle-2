@@ -84,7 +84,7 @@ bool Layout::readGrid(ifstream &file) {
     return true;
 }
             
-void Layout::writeSquare(ostream &o, int row, int col) {
+void Layout::writeSquare(ostream &o, int row, int col) const {
     char square = ' ';
     if (_lMul[row][col] > 1) {
         switch(_lMul[row][col]) {

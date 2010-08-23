@@ -11,6 +11,7 @@
 #define LAYOUT_H
 
 #include "constants.h"
+#include "types.h"
 
 using namespace std;
 
@@ -18,19 +19,21 @@ class Layout {
  public:
     Layout(const char *filename);
 
-    void writeSquare(ostream &o, int row, int col);
+    void writeSquare(ostream &o, int row, int col) const;
+    inline uint startRow() const { return _startRow; }
+    inline uint startCol() const { return _startCol; }
 
  private:
     bool checkDimensions();
     bool readGrid(ifstream &file);
 
     bool _valid;
-    int _width;
-    int _height;
-    int _startRow;
-    int _startCol;
-    int _lMul[MAXIMUM_BOARD_SIZE][MAXIMUM_BOARD_SIZE];
-    int _wMul[MAXIMUM_BOARD_SIZE][MAXIMUM_BOARD_SIZE];
+    uint _width;
+    uint _height;
+    uint _startRow;
+    uint _startCol;
+    uint _lMul[MAXIMUM_BOARD_SIZE][MAXIMUM_BOARD_SIZE];
+    uint _wMul[MAXIMUM_BOARD_SIZE][MAXIMUM_BOARD_SIZE];
 };
 
 #endif

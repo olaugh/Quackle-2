@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include "anagrammer.h"
@@ -96,7 +97,7 @@ inline int Anagrammer::countTiles(const char *input, uint *counts) {
     return validChars;
 }
 
-uint Anagrammer::setFirstPerm(const char *input) {
+inline uint Anagrammer::setFirstPerm(const char *input) {
     uint counts[BLANK + 1];
     uint validChars = countTiles(input, counts);
     if (!validChars) {
@@ -115,8 +116,41 @@ uint Anagrammer::setFirstPerm(const char *input) {
     return validChars;
 }
 
-void Anagrammer::findMoves(const Board &board, const Rack rack) {
+inline void
+Anagrammer::findOpenerSquares(const Board &board, const Rack &rack) {
+    _squares.clear();
+    uint row = board.layout()->startRow();
+    uint startCol = board.layout()->startCol();
+    uint len = rack.len();
+    for (uint col = startCol - len + 1; col <= startCol; ++col) {
+        Square sq;
+        sq.row = row;
+        sq.col = col;
+        sq.horiz = true;
+        sq.minLen = std::max(2, (int)(startCol) - (int)(col) + 1);
+        sq.maxLen = len;
+        _squares.push_back(sq);
+    }
+}
 
+inline void
+Anagrammer::findNonOpenerSquares(const Board &board, const Rack &rack) {
+    _squares.clear();
+}
+
+inline void Anagrammer::findSquares(const Board &board, const Rack &rack) {
+    if (board.isEmpty()) findOpenerSquares(board, rack);
+    else findNonOpenerSquares(board, rack);
+
+    vector<Square>::iterator end(_squares.end());
+    for (vector<Square>::iterator it = _squares.begin(); it != end; ++it) {
+        cout << "sq: " << it->row << " " << it->col
+             << " min: " << it->minLen << " max: " << it->maxLen << endl;
+    }
+}
+
+void Anagrammer::findMoves(const Board &board, const Rack &rack) {
+    findSquares(board, rack);
 }
 
 void Anagrammer::anagram(const char *input) {
