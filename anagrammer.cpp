@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -16,6 +17,7 @@
 using namespace std;
 
 Anagrammer::Anagrammer(const char* dict) {
+    _valid = true;
     _dawg = loadDawg(dict);
     computeMasks();
 }
@@ -69,10 +71,9 @@ inline bool Anagrammer::skipAhead(int start) {
     return false;
 }
 
-inline int Anagrammer::countTiles(const char *input, uint *counts) {
+inline uint Anagrammer::countTiles(const char *input, uint *counts) {
+    for (int i = FIRST_LETTER; i <= BLANK; ++i) counts[i] = 0;
     uint validChars = 0;
-    for (int i = 0; i <= BLANK; i++) counts[i] = 0;
-
     for (const char* p = input; p[0] != '\0'; ++p) {
         char c = p[0];
         int i;
@@ -97,6 +98,13 @@ inline int Anagrammer::countTiles(const char *input, uint *counts) {
     return validChars;
 }
 
+inline void Anagrammer::countRackTiles(const Rack &rack, uint *counts) {
+    for (int i = FIRST_LETTER; i <= BLANK; i++) counts[i] = 0;
+    for (int i = 0; i < rack.len(); ++i) {
+        ++counts[rack.tile(i)];
+    }
+}
+
 inline uint Anagrammer::setFirstPerm(const char *input) {
     uint counts[BLANK + 1];
     uint validChars = countTiles(input, counts);
@@ -114,6 +122,19 @@ inline uint Anagrammer::setFirstPerm(const char *input) {
     _perm[index] = '\0';
 
     return validChars;
+}
+
+inline void Anagrammer::setRackFirstPerm(const Rack &rack) {
+    uint counts[BLANK + 1];
+    countRackTiles(rack, counts);
+
+    /* This is an implementation of Algorithm L (Lexicographic permutation
+       generation) from Knuth's TAOCP Volume 4, Chapter 7.2.1.2. */
+    // L1. [Visit a_1,a_2...a_n]
+    uint index = 0;
+    for (int tile = FIRST_LETTER; tile <= BLANK; ++tile)
+        for (int j = 0; j < counts[tile]; ++j) _perm[index++] = tile;
+    _perm[index] = '\0';
 }
 
 inline void
@@ -141,16 +162,77 @@ Anagrammer::findNonOpenerSquares(const Board &board, const Rack &rack) {
 inline void Anagrammer::findSquares(const Board &board, const Rack &rack) {
     if (board.isEmpty()) findOpenerSquares(board, rack);
     else findNonOpenerSquares(board, rack);
-
+    
+    /*
     vector<Square>::iterator end(_squares.end());
     for (vector<Square>::iterator it = _squares.begin(); it != end; ++it) {
         cout << "sq: " << it->row << " " << it->col
              << " min: " << it->minLen << " max: " << it->maxLen << endl;
     }
+    */
 }
 
 void Anagrammer::findMoves(const Board &board, const Rack &rack) {
     findSquares(board, rack);
+    setRackFirstPerm(rack);
+    _nodes[0] = 0;
+
+    uint newestPrefixLen = 1;
+    uint skipUntilNewAt = 1;
+    for (;;) {
+        if (newestPrefixLen <= skipUntilNewAt + 1) {
+            for (int i = newestPrefixLen; i <= rack.len(); ++i) {
+                if (hasChild(_nodes[i - 1], _perm[i - 1])) {
+                    uint child = getChild(_nodes[i - 1], _perm[i - 1]);
+                    if (terminates(child)) {
+                        vector<Square>::iterator end(_squares.end());
+                        for (vector<Square>::iterator it = _squares.begin();
+                             it != end; ++it) {
+                            if ((i >= it->minLen) && (i <= it->maxLen)) {
+                                Move m(i, _perm, _perm, it->row, it->col, true);
+                                _moves.push_back(m);
+                            }
+                        }
+                    }
+                    unsigned int newNode = getPointer(child);
+                    _nodes[i] = newNode;
+                    if (!newNode) {
+                        skipUntilNewAt = i - 1;
+                        break;
+                    }
+                } else {
+                    skipUntilNewAt = i - 1;
+                    break;
+                }
+            }
+        }
+
+        // L2. [Find j]
+        int j = rack.len() - 2;
+        while (_perm[j] >= _perm[j + 1]) {
+            if (j == 0) return;
+            --j;
+        }
+
+        if (j > skipUntilNewAt) {
+            while (!skipAhead(skipUntilNewAt)) {
+                if (!skipUntilNewAt) return;
+                --skipUntilNewAt;
+            }
+            newestPrefixLen = skipUntilNewAt + 1;
+        } else {
+            // L3. [Increase a_j]
+            int l = rack.len() - 1;
+            while (_perm[j] >= _perm[l]) --l;
+            swap(_perm[j], _perm[l]);
+            newestPrefixLen = j + 1;
+
+            // L4. [Reverse a_j+1.,.a_n]
+            int r0 = j + 1;
+            int r1 = rack.len() - 1;
+            while (r0 < r1) swap(_perm[r0++], _perm[r1--]);
+        }
+    }
 }
 
 void Anagrammer::anagram(const char *input) {
@@ -213,12 +295,14 @@ const uint* Anagrammer::loadDawg(const char *filename) {
     char fileType[5];
     file.read(fileType, 4);
     fileType[4] = '\0';
-    //cout << fileType << endl;
+    if (strcmp(fileType, "DAWG")) {
+        cout << filename << " is not a valid DAWG file" << endl;
+        return NULL;
+    }
 
-    uint sizeBytes[1];
-    file.read((char*)sizeBytes, 4);
-    uint dawgNodes = sizeBytes[0];
-
+    uint dawgNodes;
+    file.read((char*)&dawgNodes, 4);
+    
     char *dawg = new char[dawgNodes * 4];
     file.read(dawg, dawgNodes * 4);
     return (uint*)dawg;

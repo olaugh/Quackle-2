@@ -12,6 +12,7 @@ using namespace std;
 
 void Test::testAnagram(const char *input, int times) {
     Anagrammer a("twl.dawg");
+    if (!a.isValid()) return;
     for (int i = 0; i < times; ++i) a.anagram(input);
 }
 
@@ -45,5 +46,11 @@ void Test::testOpener() {
     uchar rucksexTiles[7] = {18, 21, 3, 11, 19, 5, 24};
     Rack rucksex(7, rucksexTiles);
     Anagrammer a("twl.dawg");
+    if (!a.isValid()) return;
     a.findMoves(empty, rucksex);
+    vector<Move> *moves = a.moves();
+    vector<Move>::iterator end(moves->end());
+    for (vector<Move>::iterator it = moves->begin(); it != end; ++it) {
+        cout << *it << endl;
+    }
 }

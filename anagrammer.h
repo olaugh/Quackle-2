@@ -25,6 +25,8 @@ class Anagrammer
     Anagrammer(const char* dict);
     void anagram(const char* input);
     void findMoves(const Board &board, const Rack &rack);
+    vector<Move>* moves() { return &_moves; }
+    inline bool isValid() const { return _valid; }
 
  private:
     uint _mask[32];
@@ -32,7 +34,8 @@ class Anagrammer
     uchar _perm[MAXIMUM_RACK_SIZE + 1];
     uint _nodes[MAXIMUM_RACK_SIZE + 1];
     vector<Move> _moves;
-    
+    bool _valid;
+
     struct Square {
         uint row;
         uint col;
@@ -51,8 +54,10 @@ class Anagrammer
     inline bool terminates(uint node);
     inline unsigned int getPointer(uint node);
     inline bool skipAhead(int start);
-    inline int countTiles(const char *input, uint *counts);
+    inline uint countTiles(const char *input, uint *counts);
+    inline void countRackTiles(const Rack &rack, uint *counts);
     inline uint setFirstPerm(const char *input);
+    inline void setRackFirstPerm(const Rack &rack);
     inline void findSquares(const Board &board, const Rack &rack);
     inline void findOpenerSquares(const Board &board, const Rack &rack);
     inline void findNonOpenerSquares(const Board &board, const Rack &rack);

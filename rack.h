@@ -22,10 +22,10 @@ class Rack {
     void writeTiles(ostream &o);
     void writeEmpties(ostream &o);
     inline uint len() const { return _len; }
+    inline uint tile(uint i) const { return _tiles[i]; }
 
  private:
     void writeTile(ostream &o, uint idx);
-
     uchar _tiles[MAXIMUM_RACK_SIZE];
     uint _capacity;
     uint _len;
