@@ -35,6 +35,7 @@ class Anagrammer
     uint _nodes[MAXIMUM_RACK_SIZE + 1];
     vector<Move> _moves;
     bool _valid;
+    uint _rackLen;
 
     struct Square {
         uint row;
@@ -53,7 +54,11 @@ class Anagrammer
     inline unsigned int getChild(uint nodeIndex, char c);
     inline bool terminates(uint node);
     inline unsigned int getPointer(uint node);
-    inline bool skipAhead(int start);
+
+    inline bool skipAhead(uint start);
+    inline void increase(uint pos);
+    inline void reverseAfter(uint pos);
+
     inline uint countTiles(const char *input, uint *counts);
     inline void countRackTiles(const Rack &rack, uint *counts);
     inline uint setFirstPerm(const char *input);

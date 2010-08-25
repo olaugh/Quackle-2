@@ -47,7 +47,7 @@ inline unsigned int Anagrammer::getPointer(unsigned int node) {
     return node >> 8;
 }
 
-inline bool Anagrammer::skipAhead(int start) {
+inline bool Anagrammer::skipAhead(uint start) {
     for (int i = start + 1; _perm[i] != '\0'; ++i) {
         if (_perm[i] > _perm[start]) {
             swap(_perm[start], _perm[i]);
@@ -175,13 +175,14 @@ inline void Anagrammer::findSquares(const Board &board, const Rack &rack) {
 void Anagrammer::findMoves(const Board &board, const Rack &rack) {
     findSquares(board, rack);
     setRackFirstPerm(rack);
+    _rackLen = rack.len();
     _nodes[0] = 0;
 
     uint newestPrefixLen = 1;
     uint skipUntilNewAt = 1;
     for (;;) {
         if (newestPrefixLen <= skipUntilNewAt + 1) {
-            for (int i = newestPrefixLen; i <= rack.len(); ++i) {
+            for (int i = newestPrefixLen; i <= _rackLen; ++i) {
                 if (hasChild(_nodes[i - 1], _perm[i - 1])) {
                     uint child = getChild(_nodes[i - 1], _perm[i - 1]);
                     if (terminates(child)) {
@@ -208,31 +209,34 @@ void Anagrammer::findMoves(const Board &board, const Rack &rack) {
         }
 
         // L2. [Find j]
-        int j = rack.len() - 2;
-        while (_perm[j] >= _perm[j + 1]) {
-            if (j == 0) return;
-            --j;
-        }
+        int j = _rackLen - 2;
+        while (_perm[j] >= _perm[j + 1])
+            if (j-- == 0) return;
 
         if (j > skipUntilNewAt) {
-            while (!skipAhead(skipUntilNewAt)) {
-                if (!skipUntilNewAt) return;
-                --skipUntilNewAt;
-            }
+            while (!skipAhead(skipUntilNewAt))
+                if (!(skipUntilNewAt--)) return;
             newestPrefixLen = skipUntilNewAt + 1;
         } else {
             // L3. [Increase a_j]
-            int l = rack.len() - 1;
-            while (_perm[j] >= _perm[l]) --l;
-            swap(_perm[j], _perm[l]);
+            increase(j);
             newestPrefixLen = j + 1;
-
             // L4. [Reverse a_j+1.,.a_n]
-            int r0 = j + 1;
-            int r1 = rack.len() - 1;
-            while (r0 < r1) swap(_perm[r0++], _perm[r1--]);
+            reverseAfter(j);
         }
     }
+}
+
+inline void Anagrammer::increase(uint pos) {
+    int l = _rackLen - 1;
+    while (_perm[pos] >= _perm[l]) --l;
+    swap(_perm[pos], _perm[l]);
+}
+
+inline void Anagrammer::reverseAfter(uint pos) {
+    int r0 = pos + 1;
+    int r1 = _rackLen - 1;
+    while (r0 < r1) swap(_perm[r0++], _perm[r1--]);
 }
 
 void Anagrammer::anagram(const char *input) {
