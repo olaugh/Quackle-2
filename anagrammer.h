@@ -66,6 +66,7 @@ class Anagrammer
     inline void findSquares(const Board &board, const Rack &rack);
     inline void findOpenerSquares(const Board &board, const Rack &rack);
     inline void findNonOpenerSquares(const Board &board, const Rack &rack);
+    inline void findScoringPlays(const Board &Board, const Rack &rack);
 
     const unsigned int* loadDawg(const char *filename);
     void computeMasks();

@@ -176,8 +176,11 @@ void Anagrammer::findMoves(const Board &board, const Rack &rack) {
     findSquares(board, rack);
     setRackFirstPerm(rack);
     _rackLen = rack.len();
-    _nodes[0] = 0;
+    findScoringPlays(board, rack);
+} 
 
+inline void Anagrammer::findScoringPlays(const Board &board, const Rack &rack) {
+   _nodes[0] = 0;
     uint newestPrefixLen = 1;
     uint skipUntilNewAt = 1;
     for (;;) {
