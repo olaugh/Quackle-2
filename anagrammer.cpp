@@ -171,9 +171,16 @@ void Anagrammer::findMoves(const Board &board, const Rack &rack) {
     findSquares(board, rack);
     setRackFirstPerm(rack);
     _rackLen = rack.len();
+
     findScoringPlays(board, rack);
     findExchanges(rack);
+    findPass();
 } 
+
+inline void Anagrammer::findPass() {
+    Move m;
+    _moves.push_back(m);
+}
 
 inline void Anagrammer::findExchanges(const Rack &rack) {
     uint counts[BLANK + 1];
@@ -223,7 +230,10 @@ inline void Anagrammer::findScoringPlays(const Board &board, const Rack &rack) {
                         for (vector<Square>::iterator it = _squares.begin();
                              it != end; ++it) {
                             if ((i >= it->minLen) && (i <= it->maxLen)) {
-                                Move m(i, _perm, _perm, it->row, it->col, true);
+                                int score = 1337;
+                                float equity = 9999.9f;
+                                Move m(i, _perm, _perm, it->row, it->col, true,
+                                       score, equity);
                                 _moves.push_back(m);
                             }
                         }

@@ -28,7 +28,7 @@ void Test::testMove() {
     Move exch(1, q);
     uchar placeLetters[5] = {16, 12, 1, 3, 5};
     uchar placeTiles[5] = {16, 12, BLANK, 3, 5};
-    Move place(5, placeTiles, placeLetters, 7, 3, true);
+    Move place(5, placeTiles, placeLetters, 7, 3, true, 22, 32.0f);
     cout << pass << endl;
     cout << exch << endl;
     cout << place << endl;
@@ -51,6 +51,6 @@ void Test::testOpener() {
     vector<Move> *moves = a.moves();
     vector<Move>::iterator end(moves->end());
     for (vector<Move>::iterator it = moves->begin(); it != end; ++it) {
-        cout << *it << endl;
+        cout << *it << " (" << it->score() << " points)" << endl;
     }
 }

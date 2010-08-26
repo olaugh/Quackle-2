@@ -21,11 +21,14 @@ class Move {
     enum Action {Place, Exchange, Pass};
     Move();
     Move(uint len, uchar *tiles);
-    Move(uint len, uchar *tiles, uchar *letters, uint row, uint col, bool horiz);
+    Move(uint len, uchar *tiles, uchar *letters, uint row, uint col, bool horiz,
+         int score, float equity);
 
     bool isPass() { return _action == Pass; }
     bool isExchange() { return _action == Exchange; }
     bool isPlace() { return _action == Place; }
+    uint score() { return _score; }
+    float equity() { return _equity; }
 
     void writePosition(ostream &o);
     void writeLetters(ostream &o);
@@ -44,6 +47,8 @@ class Move {
     uint _col;
     uint _len;
     Action _action;
+    int _score;
+    float _equity;
 };
 
 ostream &operator<<(ostream &o, Move &move);

@@ -15,6 +15,7 @@ using namespace std;
 Move::Move() {
     _action = Pass;
     _len = 0;
+    _score = 0;
 }
 
 Move::Move(uint len, uchar *tiles) {
@@ -22,10 +23,11 @@ Move::Move(uint len, uchar *tiles) {
     assert(len > 0 && len <= MAXIMUM_RACK_SIZE);
     memcpy(_tiles, tiles, len);
     _len = len;
+    _score = 0;
 }
 
 Move::Move(uint len, uchar *tiles, uchar *letters, uint row, uint col,
-           bool horiz) {
+           bool horiz, int score, float equity) {
     _action = Place;
     assert(len > 0 && len <= MAXIMUM_RACK_SIZE);
     memcpy(_tiles, tiles, len);
@@ -34,6 +36,8 @@ Move::Move(uint len, uchar *tiles, uchar *letters, uint row, uint col,
     _col = col;
     _horiz = horiz;
     _len = len;
+    _score = score;
+    _equity = equity;
 }
 
 void Move::writePosition(ostream &o) {
