@@ -71,8 +71,8 @@ inline bool Anagrammer::skipAhead(uint start) {
     return false;
 }
 
-inline uint Anagrammer::countTiles(const char *input, uint *counts) {
-    for (int i = FIRST_LETTER; i <= BLANK; ++i) counts[i] = 0;
+inline uint Anagrammer::countTiles(const char *input) {
+    for (int i = FIRST_LETTER; i <= BLANK; ++i) _counts[i] = 0;
     uint validChars = 0;
     for (const char* p = input; p[0] != '\0'; ++p) {
         char c = p[0];
@@ -91,23 +91,20 @@ inline uint Anagrammer::countTiles(const char *input, uint *counts) {
         }
 
         if (valid) {
-            ++counts[i];
+            ++_counts[i];
             ++validChars;
         }
     }
     return validChars;
 }
 
-inline void Anagrammer::countRackTiles(const Rack &rack, uint *counts) {
-    for (int i = FIRST_LETTER; i <= BLANK; i++) counts[i] = 0;
-    for (int i = 0; i < rack.len(); ++i) {
-        ++counts[rack.tile(i)];
-    }
+inline void Anagrammer::countRackTiles(const Rack &rack) {
+    for (int i = FIRST_LETTER; i <= BLANK; i++) _counts[i] = 0;
+    for (int i = 0; i < rack.len(); ++i) ++_counts[rack.tile(i)];
 }
 
 inline uint Anagrammer::setFirstPerm(const char *input) {
-    uint counts[BLANK + 1];
-    uint validChars = countTiles(input, counts);
+    uint validChars = countTiles(input);
     if (!validChars) {
         cout << "no valid input" << endl;
         return 0;
@@ -117,23 +114,21 @@ inline uint Anagrammer::setFirstPerm(const char *input) {
        generation) from Knuth's TAOCP Volume 4, Chapter 7.2.1.2. */
     // L1. [Visit a_1,a_2...a_n]
     uint index = 0;
-    for (int tile = 0; tile < NUM_TILES; ++tile)
-        for (int j = 0; j < counts[tile]; ++j) _perm[index++] = tile;
+    for (int tile = FIRST_LETTER; tile <= BLANK; ++tile)
+        for (int j = 0; j < _counts[tile]; ++j) _perm[index++] = tile;
     _perm[index] = '\0';
 
     return validChars;
 }
 
 inline void Anagrammer::setRackFirstPerm(const Rack &rack) {
-    uint counts[BLANK + 1];
-    countRackTiles(rack, counts);
-
+    countRackTiles(rack);
     /* This is an implementation of Algorithm L (Lexicographic permutation
        generation) from Knuth's TAOCP Volume 4, Chapter 7.2.1.2. */
     // L1. [Visit a_1,a_2...a_n]
     uint index = 0;
     for (int tile = FIRST_LETTER; tile <= BLANK; ++tile)
-        for (int j = 0; j < counts[tile]; ++j) _perm[index++] = tile;
+        for (int j = 0; j < _counts[tile]; ++j) _perm[index++] = tile;
     _perm[index] = '\0';
 }
 
@@ -177,7 +172,12 @@ void Anagrammer::findMoves(const Board &board, const Rack &rack) {
     setRackFirstPerm(rack);
     _rackLen = rack.len();
     findScoringPlays(board, rack);
+    findExchanges(rack);
 } 
+
+inline void Anagrammer::findExchanges(const Rack &rack) {
+    
+}
 
 inline void Anagrammer::findScoringPlays(const Board &board, const Rack &rack) {
    _nodes[0] = 0;

@@ -36,6 +36,7 @@ class Anagrammer
     vector<Move> _moves;
     bool _valid;
     uint _rackLen;
+    uint _counts[BLANK + 1];
 
     struct Square {
         uint row;
@@ -59,14 +60,15 @@ class Anagrammer
     inline void increase(uint pos);
     inline void reverseAfter(uint pos);
 
-    inline uint countTiles(const char *input, uint *counts);
-    inline void countRackTiles(const Rack &rack, uint *counts);
+    inline uint countTiles(const char *input);
+    inline void countRackTiles(const Rack &rack);
     inline uint setFirstPerm(const char *input);
     inline void setRackFirstPerm(const Rack &rack);
     inline void findSquares(const Board &board, const Rack &rack);
     inline void findOpenerSquares(const Board &board, const Rack &rack);
     inline void findNonOpenerSquares(const Board &board, const Rack &rack);
     inline void findScoringPlays(const Board &Board, const Rack &rack);
+    inline void findExchanges(const Rack &rack);
 
     const unsigned int* loadDawg(const char *filename);
     void computeMasks();
