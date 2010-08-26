@@ -176,8 +176,38 @@ void Anagrammer::findMoves(const Board &board, const Rack &rack) {
 } 
 
 inline void Anagrammer::findExchanges(const Rack &rack) {
-    
+    uint counts[BLANK + 1];
+    uchar uniqTiles[MAXIMUM_RACK_SIZE + 1];
+    uint toTrade[MAXIMUM_RACK_SIZE + 1];
+    uint numUniq = 0;
+    for (uint i = FIRST_LETTER; i <= BLANK; ++i) {
+        if (_counts[i]) {
+            uniqTiles[numUniq] = i;
+            counts[numUniq++] = _counts[i];
+        }
+    }
+
+    toTrade[0] = 1;
+    for (uint i = 1; i < numUniq + 1; ++i) toTrade[i] = 0;
+    for (;;) {
+        uchar tiles[MAXIMUM_RACK_SIZE];
+        uint len = 0;
+        for (uint i = 0; i < numUniq; ++i)
+            for (uint j = 0; j < toTrade[i]; ++j)
+                tiles[len++] = uniqTiles[i];
+        Move m(len, tiles);
+        _moves.push_back(m);
+        
+        uint place;
+        for (place = 0; place < numUniq; ++place)
+            if (toTrade[place] < counts[place]) {
+                ++toTrade[place];
+                break;
+            } else toTrade[place] = 0;
+        if (place == numUniq) return;
+    }
 }
+
 
 inline void Anagrammer::findScoringPlays(const Board &board, const Rack &rack) {
    _nodes[0] = 0;
