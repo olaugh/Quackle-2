@@ -25,6 +25,7 @@ class Test
     static void testMove();
     static void testRack();
     static void testOpener();
+    static void testConvertLeaves();
 };
 
 #endif

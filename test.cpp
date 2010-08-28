@@ -11,7 +11,7 @@
 using namespace std;
 
 void Test::testAnagram(const char *input, int times) {
-    Anagrammer a("twl.dawg");
+    Anagrammer a("twl.dawg", "products.txt");
     if (!a.isValid()) return;
     for (int i = 0; i < times; ++i) a.anagram(input);
 }
@@ -45,7 +45,7 @@ void Test::testOpener() {
     Board empty(15, 15, &standard);
     uchar rucksexTiles[7] = {18, 21, 3, 11, 19, 5, 24};
     Rack rucksex(7, rucksexTiles);
-    Anagrammer a("twl.dawg");
+    Anagrammer a("twl.dawg", "twl.qsl");
     if (!a.isValid()) return;
     a.findMoves(empty, rucksex);
     vector<Move> *moves = a.moves();
@@ -54,3 +54,8 @@ void Test::testOpener() {
         cout << *it << " (" << it->score() << " points)" << endl;
     }
 }
+
+void Test::testConvertLeaves() {
+    Anagrammer::convertLeaves("products.txt", "twl.qsl");
+}
+    

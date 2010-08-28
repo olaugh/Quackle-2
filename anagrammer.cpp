@@ -13,12 +13,14 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include "anagrammer.h"
 using namespace std;
 
-Anagrammer::Anagrammer(const char* dict) {
+Anagrammer::Anagrammer(const char* dict, const char* leaves) {
     _valid = true;
     _dawg = loadDawg(dict);
+    _leaves = loadLeaves(leaves);
     computeMasks();
 }
 
@@ -353,6 +355,35 @@ const uint* Anagrammer::loadDawg(const char *filename) {
     char *dawg = new char[dawgNodes * 4];
     file.read(dawg, dawgNodes * 4);
     return (uint*)dawg;
+}
+
+const uchar* Anagrammer::loadLeaves(const char *filename) {
+    ifstream file(filename);
+    
+    file.read((char*)&_numLeaves, 4);
+    
+    char *leaves = new char[_numLeaves * 12];
+    file.read(leaves, _numLeaves * 12);
+    return (uchar*)leaves;
+}
+
+void Anagrammer::convertLeaves(const char *input, const char *output) {
+    ifstream in(input);
+    ofstream out(output, ios::out | ios::binary);
+    uint numEntries;
+    in >> numEntries;
+    out.write((char*)&numEntries, sizeof(uint));
+    while (!in.eof()) {
+        uint64_t product;
+        float value;
+        in >> product;
+        in >> value;
+        //cout << product << " " << value << endl;
+        out.write((char*)&product, sizeof(uint64_t));
+        out.write((char*)&value, sizeof(float));
+    }
+    in.close();
+    out.close();
 }
 
 void Anagrammer::computeMasks() {

@@ -17,5 +17,6 @@ int main(int argc, char **argv) {
     //Test::testMove();
     //Test::testRack();
     Test::testOpener();
+    //Test::testConvertLeaves();
     return 0;
 }

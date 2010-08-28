@@ -10,6 +10,9 @@
 #ifndef ANAGRAMMER_H
 #define ANAGRAMMER_H
 
+#include <cstdint>
+#include <map>
+#include <tr1/unordered_map>
 #include <vector>
 #include "board.h"
 #include "constants.h"
@@ -22,21 +25,26 @@ using namespace std;
 class Anagrammer
 {
  public:
-    Anagrammer(const char* dict);
+    Anagrammer(const char* dict, const char* leaves);
     void anagram(const char* input);
     void findMoves(const Board &board, const Rack &rack);
     vector<Move>* moves() { return &_moves; }
     inline bool isValid() const { return _valid; }
+    static void convertLeaves(const char *input, const char *output);
 
  private:
     uint _mask[32];
     const uint *_dawg;
+    const uchar *_leaves;
+    uint _numLeaves;
+
     uchar _perm[MAXIMUM_RACK_SIZE + 1];
     uint _nodes[MAXIMUM_RACK_SIZE + 1];
-    vector<Move> _moves;
     bool _valid;
     uint _rackLen;
     uint _counts[BLANK + 1];
+
+    vector<Move> _moves;
 
     struct Square {
         uint row;
@@ -71,7 +79,8 @@ class Anagrammer
     inline void findExchanges(const Rack &rack);
     inline void findPass();
 
-    const unsigned int* loadDawg(const char *filename);
+    const uint* loadDawg(const char *filename);
+    const uchar* loadLeaves(const char *filename);
     void computeMasks();
 };
 
