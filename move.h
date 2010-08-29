@@ -20,7 +20,7 @@ class Move {
  public:
     enum Action {Place, Exchange, Pass};
     Move();
-    Move(uint len, uchar *tiles);
+    Move(uint len, uchar *tiles, float equity);
     Move(uint len, uchar *tiles, uchar *letters, uint row, uint col, bool horiz,
          int score, float equity);
 

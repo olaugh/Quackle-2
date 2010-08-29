@@ -16,14 +16,16 @@ Move::Move() {
     _action = Pass;
     _len = 0;
     _score = 0;
+    _equity = -1000.0f;
 }
 
-Move::Move(uint len, uchar *tiles) {
+Move::Move(uint len, uchar *tiles, float equity) {
     _action = Exchange;
     assert(len > 0 && len <= MAXIMUM_RACK_SIZE);
     memcpy(_tiles, tiles, len);
     _len = len;
     _score = 0;
+    _equity = equity;
 }
 
 Move::Move(uint len, uchar *tiles, uchar *letters, uint row, uint col,

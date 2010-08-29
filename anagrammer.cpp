@@ -17,10 +17,24 @@
 #include "anagrammer.h"
 using namespace std;
 
-Anagrammer::Anagrammer(const char* dict, const char* leaves) {
+Anagrammer::Anagrammer(const char* lex) {
     _valid = true;
+
+    char dict[100];
+    strcpy(dict, lex);
+    strcat(dict, ".dawg");
     _dawg = loadDawg(dict);
+
+    char leaves[100];
+    strcpy(leaves, lex);
+    strcat(leaves, ".qsl");
     _leaves = loadLeaves(leaves);
+
+    char primes[100];
+    strcpy(primes, lex);
+    strcat(primes, ".qpr");
+    _primes = loadPrimes(primes);
+
     computeMasks();
 }
 
@@ -71,6 +85,14 @@ inline bool Anagrammer::skipAhead(uint start) {
     for (int i = 0; i < numOfTemp; ++i) cyclePtr[i] = temp;
  
     return false;
+}
+
+inline uint Anagrammer::charToIndex(uchar c) {
+    int i;
+    if ((c >= 'a') && (c <= 'z')) return c + FIRST_LETTER - 'a';
+    if ((c >= 'A') && (c <= 'Z')) return c + FIRST_LETTER - 'A';
+    if ((c == '?') || (c == '.')) return i = BLANK;
+    return EMPTY_SQUARE;
 }
 
 inline uint Anagrammer::countTiles(const char *input) {
@@ -201,10 +223,13 @@ inline void Anagrammer::findExchanges(const Rack &rack) {
     for (;;) {
         uchar tiles[MAXIMUM_RACK_SIZE];
         uint len = 0;
+        uint64_t prod = 1;
         for (uint i = 0; i < numUniq; ++i)
-            for (uint j = 0; j < toTrade[i]; ++j)
+            for (uint j = 0; j < toTrade[i]; ++j) {
                 tiles[len++] = uniqTiles[i];
-        Move m(len, tiles);
+                prod *= _primes[uniqTiles[i]];
+            }
+        Move m(len, tiles, prodValue(prod));
         _moves.push_back(m);
         
         uint place;
@@ -365,6 +390,61 @@ const uchar* Anagrammer::loadLeaves(const char *filename) {
     char *leaves = new char[_numLeaves * 12];
     file.read(leaves, _numLeaves * 12);
     return (uchar*)leaves;
+}
+
+const uint64_t* Anagrammer::loadPrimes(const char *filename) {
+    ifstream file(filename);
+    uint64_t *primes = new uint64_t[BLANK + 1];
+    for (uint i = 0; i <= BLANK; ++i) primes[i] = 0;
+    for (;;) {
+        uchar c;
+        file >> c;
+
+        uint64_t p;
+        file >> p;
+
+        if (file.eof()) break;
+        primes[charToIndex(c)] = p;
+    }
+    return primes;
+}
+
+float Anagrammer::prodValue(uint64_t product) {
+    if (product == 1) return 0.0f;
+    uint min = 0;
+    uint max = _numLeaves - 1;
+    uint mid;
+    uint64_t midProduct;
+
+    do {
+        mid = min + (max - min) / 2;
+        midProduct = indexLeave(mid)->product;
+        if (product > midProduct) min = mid + 1;
+        else max = mid - 1;
+    } while ((midProduct != product) && (min <= max));
+
+    if (midProduct == product) return indexLeave(mid)->value;
+    else {
+        cout << "could not find value for product " << product << "!" << endl;
+        return 0.0f;
+    }
+}
+
+inline Anagrammer::leave_t* Anagrammer::indexLeave(uint index) {
+    return (leave_t*)(_leaves + 12 * index);
+}
+
+uint64_t Anagrammer::stringProd(const char *s) {
+    uint64_t prod = 1;
+    for (uint i = 0; s[i]; ++i) prod *= _primes[charToIndex(s[i])];
+    return prod;
+}
+
+void Anagrammer::testLeaves() {
+    for (int i = 0; i < _numLeaves; ++i) {
+        leave_t *leave = (leave_t*)(_leaves + 12 * i);
+        cout << leave->product << " " << leave->value << endl;
+    }
 }
 
 void Anagrammer::convertLeaves(const char *input, const char *output) {

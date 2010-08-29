@@ -15,6 +15,7 @@
 #include "board.h"
 #include "constants.h"
 #include "layout.h"
+#include "types.h"
 using namespace std;
 
 class Test
@@ -26,6 +27,8 @@ class Test
     static void testRack();
     static void testOpener();
     static void testConvertLeaves();
+    static void testLeaves();
+    static void testLeaveLookup();
 };
 
 #endif
