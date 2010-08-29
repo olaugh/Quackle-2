@@ -7,17 +7,16 @@
  *************************************************************
  */
 
-#ifndef LAYOUT_H
-#define LAYOUT_H
+#ifndef CONFIG_H
+#define CONFIG_H
 
 #include "constants.h"
 #include "types.h"
-
 using namespace std;
 
-class Layout {
+class Config {
  public:
-    Layout(const char *filename);
+    Config(const char *filename);
 
     void writeSquare(ostream &o, int row, int col) const;
     inline uint startRow() const { return _startRow; }

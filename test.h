@@ -13,8 +13,8 @@
 #include <iostream>
 #include "anagrammer.h"
 #include "board.h"
+#include "config.h"
 #include "constants.h"
-#include "layout.h"
 #include "types.h"
 using namespace std;
 

@@ -9,11 +9,11 @@
 
 #include <fstream>
 #include <iostream>
-#include "layout.h"
+#include "config.h"
 #include "board.h"
 using namespace std;
 
-Layout::Layout(const char* filename) {
+Config::Config(const char* filename) {
     _valid = true;
     string by; // dummy
     ifstream file(filename);
@@ -30,7 +30,7 @@ Layout::Layout(const char* filename) {
     _valid = false;
 }
 
-bool Layout::checkDimensions() {
+bool Config::checkDimensions() {
     if (_width < MINIMUM_BOARD_SIZE) {
         cout << "width is smaller than minimum of "
              << MINIMUM_BOARD_SIZE << endl;
@@ -44,7 +44,7 @@ bool Layout::checkDimensions() {
     return true;
 }
 
-bool Layout::readGrid(ifstream &file) {
+bool Config::readGrid(ifstream &file) {
     for (int row = 0; row < _height; ++row) {
         for (int col = 0; col < _width; ++col) {
             string square;
@@ -84,7 +84,7 @@ bool Layout::readGrid(ifstream &file) {
     return true;
 }
             
-void Layout::writeSquare(ostream &o, int row, int col) const {
+void Config::writeSquare(ostream &o, int row, int col) const {
     char square = ' ';
     if (_lMul[row][col] > 1) {
         switch(_lMul[row][col]) {

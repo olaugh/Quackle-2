@@ -14,17 +14,17 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "layout.h"
+#include "config.h"
 using namespace std;
 
 class Board
 {
  public:
-    Board(int width, int height, const Layout *layout);
+    Board(int width, int height, const Config *config);
 
     void clear();
     inline bool isEmpty() const { return _empty; }
-    inline const Layout* layout() const { return _layout; }
+    inline const Config* config() const { return _config; }
     void writeColumnHeaders(ostream &o);
     void writeHorizontalLine(ostream &o);
     void writeRows(ostream &o);
@@ -35,7 +35,7 @@ class Board
  private:
     int _width;
     int _height;
-    const Layout *_layout;
+    const Config *_config;
     bool _empty;
 
     char _letters[MAXIMUM_BOARD_SIZE][MAXIMUM_BOARD_SIZE];

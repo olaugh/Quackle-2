@@ -15,10 +15,10 @@
 #include "board.h"
 using namespace std;
 
-Board::Board(int width, int height, const Layout *layout) {
+Board::Board(int width, int height, const Config *config) {
     _width = width;
     _height = height;
-    _layout = layout;
+    _config = config;
     clear();
 }
 
@@ -64,7 +64,7 @@ void Board::writeLetter(ostream &o, int row, int col) {
 
 void Board::writeSquare(ostream &o, int row, int col) {
     if (_letters[row][col]) writeLetter(o, row, col);
-    else _layout->writeSquare(o, row, col);
+    else _config->writeSquare(o, row, col);
 }
 
 ostream &operator<<(ostream &o, Board &board) {

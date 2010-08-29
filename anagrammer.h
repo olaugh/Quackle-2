@@ -53,6 +53,7 @@ class Anagrammer
     bool _valid;
     uint _rackLen;
     uint _counts[BLANK + 1];
+    uint64_t _rackProd;
 
     vector<Move> _moves;
 

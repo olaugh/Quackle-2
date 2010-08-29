@@ -17,7 +17,7 @@ void Test::testAnagram(const char *input, int times) {
 }
 
 void Test::testBoard() {
-    Layout standard("standard.qly");
+    Config standard("standard.qly");
     Board b(15, 15, &standard);
     cout << b;
 }
@@ -41,7 +41,7 @@ void Test::testRack() {
 }
 
 void Test::testOpener() {
-    Layout standard("standard.qly");
+    Config standard("standard.qly");
     Board empty(15, 15, &standard);
     uchar rucksexTiles[7] = {18, 21, 3, 11, 19, 5, 24};
     Rack rucksex(7, rucksexTiles);

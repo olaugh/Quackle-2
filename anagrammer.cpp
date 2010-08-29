@@ -96,6 +96,7 @@ inline uint Anagrammer::charToIndex(uchar c) {
 }
 
 inline uint Anagrammer::countTiles(const char *input) {
+    _rackProd = 1;
     for (int i = FIRST_LETTER; i <= BLANK; ++i) _counts[i] = 0;
     uint validChars = 0;
     for (const char* p = input; p[0] != '\0'; ++p) {
@@ -116,6 +117,7 @@ inline uint Anagrammer::countTiles(const char *input) {
 
         if (valid) {
             ++_counts[i];
+            _rackProd *= _primes[i];
             ++validChars;
         }
     }
@@ -123,8 +125,12 @@ inline uint Anagrammer::countTiles(const char *input) {
 }
 
 inline void Anagrammer::countRackTiles(const Rack &rack) {
+    _rackProd = 1;
     for (int i = FIRST_LETTER; i <= BLANK; i++) _counts[i] = 0;
-    for (int i = 0; i < rack.len(); ++i) ++_counts[rack.tile(i)];
+    for (int i = 0; i < rack.len(); ++i) {
+        ++_counts[rack.tile(i)];
+        _rackProd *= _primes[rack.tile(i)];
+    }
 }
 
 inline uint Anagrammer::setFirstPerm(const char *input) {
@@ -159,8 +165,8 @@ inline void Anagrammer::setRackFirstPerm(const Rack &rack) {
 inline void
 Anagrammer::findOpenerSquares(const Board &board, const Rack &rack) {
     _squares.clear();
-    uint row = board.layout()->startRow();
-    uint startCol = board.layout()->startCol();
+    uint row = board.config()->startRow();
+    uint startCol = board.config()->startCol();
     uint len = rack.len();
     for (uint col = startCol - len + 1; col <= startCol; ++col) {
         Square sq;
@@ -229,7 +235,7 @@ inline void Anagrammer::findExchanges(const Rack &rack) {
                 tiles[len++] = uniqTiles[i];
                 prod *= _primes[uniqTiles[i]];
             }
-        Move m(len, tiles, prodValue(prod));
+        Move m(len, tiles, prodValue(_rackProd / prod));
         _moves.push_back(m);
         
         uint place;
