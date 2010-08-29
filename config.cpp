@@ -9,12 +9,26 @@
 
 #include <fstream>
 #include <iostream>
+#include <string.h>
 #include "config.h"
 #include "board.h"
 using namespace std;
 
-Config::Config(const char* filename) {
+Config::Config(const char* layout, const char *tiles) {
+    char layoutFile[100];
+    strcpy(layoutFile, layout);
+    strcat(layoutFile, ".qly");
+    loadLayout(layoutFile);
+
+    char tilesFile[100];
+    strcpy(tilesFile, tiles);
+    strcat(tilesFile, ".qtd");
+    loadTiles(tilesFile);
+}
+
+void Config::loadLayout(const char *filename) {
     _valid = true;
+
     string by; // dummy
     ifstream file(filename);
     file >> _width;
@@ -28,6 +42,10 @@ Config::Config(const char* filename) {
 
  invalid:
     _valid = false;
+}
+
+void Config::loadTiles(const char *filename) {
+    // read in .qtd file with tile distribution and scores
 }
 
 bool Config::checkDimensions() {

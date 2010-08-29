@@ -16,13 +16,15 @@ using namespace std;
 
 class Config {
  public:
-    Config(const char *filename);
+    Config(const char *layout, const char *tiles);
 
     void writeSquare(ostream &o, int row, int col) const;
     inline uint startRow() const { return _startRow; }
     inline uint startCol() const { return _startCol; }
 
  private:
+    void loadLayout(const char *filename);
+    void loadTiles(const char *filename);
     bool checkDimensions();
     bool readGrid(ifstream &file);
 

@@ -12,11 +12,12 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-    //Test::testAnagram("RETAINS", 1);
-    //Test::testBoard();
-    //Test::testMove();
-    //Test::testRack();
+    Test::testAnagram("RETAINS", 1);
+    Test::testBoard();
+    Test::testMove();
+    Test::testRack();
     Test::testOpener();
+
     //Test::testLeaves();
     //Test::testConvertLeaves();
     //Test::testLeaveLookup();
