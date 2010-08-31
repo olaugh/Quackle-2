@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <algorithm>
 #include "move.h"
 using namespace std;
 
@@ -40,6 +41,14 @@ Move::Move(uint len, uchar *tiles, uchar *letters, uint row, uint col,
     _len = len;
     _score = score;
     _equity = equity;
+}
+
+void Move::sortByEquity(vector<Move> *list) {
+    stable_sort(list->begin(), list->end(), equityComparator);
+}
+
+bool Move::equityComparator(const Move &move1, const Move &move2) {
+    return move1.equity() > move2.equity();
 }
 
 void Move::writePosition(ostream &o) {
@@ -94,3 +103,4 @@ ostream &operator<<(ostream &o, Move &move) {
     }
     return o;
 }
+

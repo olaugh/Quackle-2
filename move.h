@@ -11,6 +11,7 @@
 #define MOVE_H
 
 #include <iostream>
+#include <vector>
 #include "constants.h"
 #include "types.h"
 #include "util.h"
@@ -24,15 +25,18 @@ class Move {
     Move(uint len, uchar *tiles, uchar *letters, uint row, uint col, bool horiz,
          int score, float equity);
 
-    bool isPass() { return _action == Pass; }
-    bool isExchange() { return _action == Exchange; }
-    bool isPlace() { return _action == Place; }
-    uint score() { return _score; }
-    float equity() { return _equity; }
+    bool isPass() const { return _action == Pass; }
+    bool isExchange() const { return _action == Exchange; }
+    bool isPlace() const { return _action == Place; }
+    uint score() const { return _score; }
+    float equity() const { return _equity; }
 
     void writePosition(ostream &o);
     void writeLetters(ostream &o);
     void writeTiles(ostream &o);
+    
+    static void sortByEquity(vector<Move> *list);
+    static bool equityComparator(const Move &move1, const Move &move2);
 
  private:
     void writeRow(ostream &o);

@@ -33,7 +33,6 @@ class Anagrammer
     static void convertLeaves(const char *input, const char *output);
     void testLeaves();
     float prodValue(uint64_t product);
-    static uint charToIndex(uchar c);
     uint64_t stringProd(const char *s);
 
  private:
@@ -54,6 +53,7 @@ class Anagrammer
     uint _rackLen;
     uint _counts[BLANK + 1];
     uint64_t _rackProd;
+    uint _rackScores[MAXIMUM_RACK_SIZE];
 
     vector<Move> _moves;
 
@@ -85,6 +85,7 @@ class Anagrammer
     inline void countRackTiles(const Rack &rack);
     inline uint setFirstPerm(const char *input);
     inline void setRackFirstPerm(const Rack &rack);
+    inline void lookupRackScores(const Config *config, const Rack &r);
     inline void findSquares(const Board &board, const Rack &rack);
     inline void findOpenerSquares(const Board &board, const Rack &rack);
     inline void findNonOpenerSquares(const Board &board, const Rack &rack);

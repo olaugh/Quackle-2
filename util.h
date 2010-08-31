@@ -21,6 +21,7 @@ class Util
     static void writeBlankLetter(ostream &o, uchar letter);
     static void writeLetter(ostream &o, uchar letter);
     static void writeTile(ostream &o, uchar tile);
+    static uint charToIndex(uchar c);
 };
 
 #endif

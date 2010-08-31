@@ -43,15 +43,21 @@ void Test::testRack() {
 void Test::testOpener() {
     Config standard("standard", "english");
     Board empty(15, 15, &standard);
-    uchar rucksexTiles[7] = {18, 21, 3, 11, 19, 5, 24};
+    uchar rucksexTiles[7] = {18, 21, 3, 11, 19, 5, 24}; //rucksex
+    //uchar rucksexTiles[7] = {18, 5, 20, 1, 9, 14, 19};  //retains
+    //uchar rucksexTiles[7] = {22, 9, 22, 9, 6, 9, 3}; //vivific
     Rack rucksex(7, rucksexTiles);
     Anagrammer a("twl");
     if (!a.isValid()) return;
-    a.findMoves(empty, rucksex);
-    vector<Move> *moves = a.moves();
-    vector<Move>::iterator end(moves->end());
-    for (vector<Move>::iterator it = moves->begin(); it != end; ++it) {
-        cout << *it << " (" << it->score() << " points) " << it->equity() << endl;
+    for (int i = 0; i < 1; ++i) {
+        a.findMoves(empty, rucksex);
+        vector<Move> *moves = a.moves();
+        Move::sortByEquity(moves);
+        vector<Move>::iterator end(moves->end());
+        for (vector<Move>::iterator it = moves->begin(); it != end; ++it) {
+            cout << *it << " (" << it->score() << " points) "
+                 << it->equity() << endl;
+        }
     }
 }
 
@@ -90,5 +96,4 @@ void Test::testLeaveLookup() {
     float jqxz__Value = a.prodValue(jqxz__Prod);
     cout << "product for " << jqxz__ << " is " << jqxz__Prod << endl;
     cout << "value for " << jqxz__ << " is " << jqxz__Value << endl;
-
 }

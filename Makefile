@@ -1,5 +1,5 @@
 CXX = g++
-FLAGS = -std=gnu++0x -m64
+FLAGS = -std=gnu++0x -m64 -O3
 OBJS = main.o anagrammer.o board.o config.o move.o rack.o test.o util.o
 
 test : $(OBJS)
@@ -14,7 +14,7 @@ anagrammer.o : anagrammer.cpp anagrammer.h board.h constants.h move.h types.h
 board.o : board.cpp board.h config.h constants.h types.h
 	$(CXX) $(FLAGS) $(DEBUG) -c board.cpp
 
-config.o : config.cpp constants.h types.h config.h
+config.o : config.cpp board.h config.h constants.h types.h util.h
 	$(CXX) $(FLAGS) $(DEBUG) -c config.cpp
 
 move.o : move.cpp constants.h types.h move.h util.h
@@ -23,7 +23,8 @@ move.o : move.cpp constants.h types.h move.h util.h
 rack.o : rack.cpp constants.h types.h rack.h util.h
 	$(CXX) $(FLAGS) $(DEBUG) -c rack.cpp
 
-test.o : test.cpp anagrammer.h config.h constants.h rack.h test.h types.h 
+test.o : test.cpp anagrammer.h board.h config.h constants.h rack.h test.h \
+	types.h 
 	$(CXX) $(FLAGS) $(DEBUG) -c test.cpp
 
 clean :

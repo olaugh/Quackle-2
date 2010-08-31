@@ -87,14 +87,6 @@ inline bool Anagrammer::skipAhead(uint start) {
     return false;
 }
 
-inline uint Anagrammer::charToIndex(uchar c) {
-    int i;
-    if ((c >= 'a') && (c <= 'z')) return c + FIRST_LETTER - 'a';
-    if ((c >= 'A') && (c <= 'Z')) return c + FIRST_LETTER - 'A';
-    if ((c == '?') || (c == '.')) return i = BLANK;
-    return EMPTY_SQUARE;
-}
-
 inline uint Anagrammer::countTiles(const char *input) {
     _rackProd = 1;
     for (int i = FIRST_LETTER; i <= BLANK; ++i) _counts[i] = 0;
@@ -127,7 +119,7 @@ inline uint Anagrammer::countTiles(const char *input) {
 inline void Anagrammer::countRackTiles(const Rack &rack) {
     _rackProd = 1;
     for (int i = FIRST_LETTER; i <= BLANK; i++) _counts[i] = 0;
-    for (int i = 0; i < rack.len(); ++i) {
+    for (int i = 0; i < _rackLen; ++i) {
         ++_counts[rack.tile(i)];
         _rackProd *= _primes[rack.tile(i)];
     }
@@ -197,10 +189,19 @@ inline void Anagrammer::findSquares(const Board &board, const Rack &rack) {
     */
 }
 
+inline void Anagrammer::lookupRackScores(const Config *config, const Rack &r) {
+    for (int i = 0; i < _rackLen; ++i)
+        _rackScores[i] = config->tileScore(_perm[i]);
+    //for (int i = 0; i < _rackLen; ++i) cout << _rackScores[i] << " ";
+    //cout << endl;
+}
+
 void Anagrammer::findMoves(const Board &board, const Rack &rack) {
+    _moves.clear();
     findSquares(board, rack);
-    setRackFirstPerm(rack);
     _rackLen = rack.len();
+    setRackFirstPerm(rack);
+    lookupRackScores(board.config(), rack);
 
     findScoringPlays(board, rack);
     findExchanges(rack);
@@ -253,20 +254,33 @@ inline void Anagrammer::findScoringPlays(const Board &board, const Rack &rack) {
    _nodes[0] = 0;
     uint newestPrefixLen = 1;
     uint skipUntilNewAt = 1;
+    const Config *conf = board.config();
     for (;;) {
         if (newestPrefixLen <= skipUntilNewAt + 1) {
             for (int i = newestPrefixLen; i <= _rackLen; ++i) {
                 if (hasChild(_nodes[i - 1], _perm[i - 1])) {
                     uint child = getChild(_nodes[i - 1], _perm[i - 1]);
+                    uint64_t prod = 1;
+                    for (uint j = 0; j < i; ++j) prod *= _primes[_perm[j]];
                     if (terminates(child)) {
                         vector<Square>::iterator end(_squares.end());
+                        float leave = prodValue(_rackProd / prod);
+                        //cout << (_rackProd / prod) << " " << leave << endl;
+                        int bonus = (i == _rackLen) ? 50 : 0;
                         for (vector<Square>::iterator it = _squares.begin();
                              it != end; ++it) {
+                            int score = 0;
+                            uint wMul = 1;
                             if ((i >= it->minLen) && (i <= it->maxLen)) {
-                                int score = 1337;
-                                float equity = 9999.9f;
+                                for (uint j = 0; j < i; ++j) {
+                                    uint col = it->col + j;
+                                    uint tScr = conf->tileScore(_perm[j]);
+                                    score += tScr * conf->lMul(it->row, col);
+                                    wMul *= conf->wMul(it->row, col);
+                                }
+                                score = score * wMul + bonus;
                                 Move m(i, _perm, _perm, it->row, it->col, true,
-                                       score, equity);
+                                       score, score + leave);
                                 _moves.push_back(m);
                             }
                         }
@@ -410,7 +424,7 @@ const uint64_t* Anagrammer::loadPrimes(const char *filename) {
         file >> p;
 
         if (file.eof()) break;
-        primes[charToIndex(c)] = p;
+        primes[Util::charToIndex(c)] = p;
     }
     return primes;
 }
@@ -442,7 +456,7 @@ inline Anagrammer::leave_t* Anagrammer::indexLeave(uint index) {
 
 uint64_t Anagrammer::stringProd(const char *s) {
     uint64_t prod = 1;
-    for (uint i = 0; s[i]; ++i) prod *= _primes[charToIndex(s[i])];
+    for (uint i = 0; s[i]; ++i) prod *= _primes[Util::charToIndex(s[i])];
     return prod;
 }
 

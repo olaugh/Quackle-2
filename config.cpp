@@ -46,6 +46,24 @@ void Config::loadLayout(const char *filename) {
 
 void Config::loadTiles(const char *filename) {
     // read in .qtd file with tile distribution and scores
+    ifstream file(filename);
+    for (uint i = 0; i <= BLANK; ++i) _counts[i] = 0;
+    for (uint i = 0; i <= BLANK; ++i) _scores[i] = 0;
+    for (;;) {
+        uchar c;
+        file >> c;
+
+        uint score;
+        file >> score;
+
+        uint count;
+        file >> count;
+        
+        if (file.eof()) break;
+        _counts[Util::charToIndex(c)] = count;
+        _scores[Util::charToIndex(c)] = score;
+        //cout << c << " " << score << " " << count << endl;
+    }
 }
 
 bool Config::checkDimensions() {
