@@ -43,6 +43,12 @@ inline void Anagrammer::printTruncated(int length) {
     cout << endl;
 }
 
+inline void Anagrammer::printTruncated(int length, bool octo) {
+    for (int i = 0; i < length; ++i) Util::writeTile(cout, _perm[i]);
+    if (octo) cout << "#";
+    cout << endl;
+}
+
 inline bool Anagrammer::hasChild(uint nodeIndex, uchar c) {
     uint bits = _dawg[nodeIndex];
     uint bit = 1 << c;
@@ -55,8 +61,35 @@ inline uint Anagrammer::getChild(uint nodeIndex, char c) {
     return _dawg[nodeIndex + 1 + __builtin_popcount(bits & _mask[n])];
 }
 
+inline uchar Anagrammer::getChildLetter(uint nodeIndex, uint idx) {
+    uint setBits = 0;
+    uint bits = _dawg[nodeIndex];
+    for (uint letter = FIRST_LETTER; letter < BLANK; ++letter) {
+        uint bit = 1 << letter;
+        if (bits & bit) ++setBits;
+        if (setBits == idx + 1) return letter;
+    }
+}
+
+inline void Anagrammer::printChildren(uint nodeIndex) {
+    uint bits = _dawg[nodeIndex];
+    for (uint letter = FIRST_LETTER; letter < BLANK; ++letter) {
+        uint bit = 1 << letter;
+        if (bits & bit) Util::writeLetter(cout, letter);
+    }
+    cout << endl;
+}
+
+inline uint Anagrammer::numChildren(uint nodeIndex) {
+    return __builtin_popcount(_dawg[nodeIndex]);
+}
+
 inline bool Anagrammer::terminates(unsigned int node) {
     return (node & 1) != 0;
+}
+
+inline bool Anagrammer::inSmallerDict(unsigned int node) {
+    return (node & 2) != 0;
 }
 
 inline unsigned int Anagrammer::getPointer(unsigned int node) {
@@ -251,48 +284,103 @@ inline void Anagrammer::findExchanges(const Rack &rack) {
 
 
 inline void Anagrammer::findScoringPlays(const Board &board, const Rack &rack) {
-   _nodes[0] = 0;
+    _nodes[0] = 0;
+    uint activeBlanks = 0;
+    BlankState bStates[MAXIMUM_RACK_SIZE];
+    BlankState *bState;
     uint newestPrefixLen = 1;
     uint skipUntilNewAt = 1;
     const Config *conf = board.config();
     for (;;) {
+        uint pos = newestPrefixLen - 1;
+        uchar tile = _perm[pos];
+        uchar letter;
+        cout << "pos: " << pos << endl;
+        cout << "_perm: ";
+        printTruncated(7);
+        //cout << "letter: ";
+        //Util::writeTile(cout, tile);
+        //cout << endl;
+
         if (newestPrefixLen <= skipUntilNewAt + 1) {
-            for (int i = newestPrefixLen; i <= _rackLen; ++i) {
-                if (hasChild(_nodes[i - 1], _perm[i - 1])) {
-                    uint child = getChild(_nodes[i - 1], _perm[i - 1]);
+            for (; pos <= _rackLen; ++pos) {
+                tile = _perm[pos];
+                letter = tile;
+
+                //cout << "  checking prefix ";
+                //printTruncated(pos);
+
+                if (tile == BLANK) {
+                    bState = &bStates[activeBlanks++];
+                    bState->idx = 0;
+                    bState->lim = numChildren(_nodes[pos]);
+                    bState->pos = pos;
+                increment_blank:
+                    cout << "activeBlanks: " << activeBlanks << endl;
+                    cout << "  bState->idx: " << bState->idx << endl;
+                    cout << "  bState->lim: " << bState->lim << endl;
+                    pos = bState->pos;
+                    cout << "  node's child letters: ";
+                    printChildren(_nodes[pos]);
+                    letter = getChildLetter(_nodes[pos], bState->idx);
+                    bState->ltr = letter;
+                    cout << "  blankLetter: ";
+                    Util::writeTile(cout, letter);
+                    cout << endl;
+                    //cout << "  _perm: ";
+                    //printTruncated(newestPrefixLen);
+                    //printTruncated(7);
+                } 
+
+                //uchar letter = activeBlanks ? bState->ltr : _perm[i - 1];
+                int len = pos + 1;
+                printTruncated(pos);
+                cout << "  has child letter ";
+                Util::writeTile(cout, letter);
+                cout << "?" << endl;
+                if (hasChild(_nodes[pos], letter)) {
+                    //cout << "    yes" << endl;
+                    uint child = getChild(_nodes[pos], letter);
                     uint64_t prod = 1;
-                    for (uint j = 0; j < i; ++j) prod *= _primes[_perm[j]];
+                    for (uint j = 0; j <= pos; ++j) prod *= _primes[_perm[j]];
                     if (terminates(child)) {
                         vector<Square>::iterator end(_squares.end());
                         float leave = prodValue(_rackProd / prod);
                         //cout << (_rackProd / prod) << " " << leave << endl;
-                        int bonus = (i == _rackLen) ? 50 : 0;
+                        int bonus = (len == _rackLen) ? 50 : 0;
                         for (vector<Square>::iterator it = _squares.begin();
                              it != end; ++it) {
                             int score = 0;
                             uint wMul = 1;
-                            if ((i >= it->minLen) && (i <= it->maxLen)) {
-                                for (uint j = 0; j < i; ++j) {
+                            if ((len >= it->minLen) && (len <= it->maxLen)) {
+                                for (uint j = 0; j < len; ++j) {
                                     uint col = it->col + j;
                                     uint tScr = conf->tileScore(_perm[j]);
                                     score += tScr * conf->lMul(it->row, col);
                                     wMul *= conf->wMul(it->row, col);
                                 }
                                 score = score * wMul + bonus;
-                                Move m(i, _perm, _perm, it->row, it->col, true,
-                                       score, score + leave);
+                                uchar letters[MAXIMUM_RACK_SIZE + 1];
+                                for (int i = 0; i < len; ++i)
+                                    letters[i] = _perm[i];
+                                for (int i = 0; i < activeBlanks; ++i)
+                                    letters[bStates[i].pos] = bStates[i].ltr;
+                                Move m(len, _perm, letters, it->row, it->col,
+                                       true, score, score + leave);
+                                cout << "pushing move: " << m << endl;
                                 _moves.push_back(m);
                             }
                         }
                     }
                     unsigned int newNode = getPointer(child);
-                    _nodes[i] = newNode;
+                    _nodes[pos + 1] = newNode;
                     if (!newNode) {
-                        skipUntilNewAt = i - 1;
+                        skipUntilNewAt = pos;
                         break;
                     }
                 } else {
-                    skipUntilNewAt = i - 1;
+                    //cout << "    no" << endl;
+                    skipUntilNewAt = pos;
                     break;
                 }
             }
@@ -300,14 +388,94 @@ inline void Anagrammer::findScoringPlays(const Board &board, const Rack &rack) {
 
         // L2. [Find j]
         int j = _rackLen - 2;
-        while (_perm[j] >= _perm[j + 1])
-            if (j-- == 0) return;
+        while (_perm[j] >= _perm[j + 1]) {
+            if (j-- == 0) {
+                if (activeBlanks && (++bState->idx < bState->lim)) {
+                    cout << "  incrementing blank" << endl;
+                    newestPrefixLen = bState->pos + 1;
+                    goto increment_blank;
+                }
+                return;
+            }
+        }
 
         if (j > skipUntilNewAt) {
-            while (!skipAhead(skipUntilNewAt))
-                if (!(skipUntilNewAt--)) return;
+            cout << "no words with prefix ";
+            printTruncated(skipUntilNewAt + 1);
+
+            if (activeBlanks && (skipUntilNewAt <= bState->pos)
+                             && (++bState->idx < bState->lim)) {
+                cout << "  incrementing blank" << endl;
+                newestPrefixLen = bState->pos + 1;
+                goto increment_blank;
+            }
+
+            while (!skipAhead(skipUntilNewAt)) {
+                if (!(skipUntilNewAt--)) {
+                     if (activeBlanks && (++bState->idx < bState->lim)) {
+                         uchar temp = _perm[_rackLen - 1];
+                         for (int i = _rackLen - 2; i >= 0; --i)
+                             _perm[i + 1] = _perm[i];
+                         _perm[0] = temp;
+                         cout << "  incrementing blank" << endl;
+                         newestPrefixLen = bState->pos + 1;
+                         goto increment_blank;
+                     }
+                    return;
+                }
+            }
+
             newestPrefixLen = skipUntilNewAt + 1;
+            cout << "  skipped ahead, newest prefix len now "
+                 << newestPrefixLen << endl;
+
+            if (activeBlanks) {
+                cout << "  are we really skipping? a blank is active" << endl;
+                cout << "activeBlanks: " << activeBlanks << endl;
+                cout << "skipUntilNewAt: " << skipUntilNewAt << endl;
+                cout << "bState->pos: " << bState->pos << endl;
+                if (++bState->idx < bState->lim) {
+                    cout << "  _perm: ";
+                    printTruncated(7);
+                    if (_perm[bState->pos] != BLANK) {
+                        cout << "   blank is out of its position!" << endl;
+                        for (uint i = newestPrefixLen; i < _rackLen; ++i) {
+                            if (_perm[i] == BLANK) {
+                                std::swap(_perm[i], _perm[bState->pos]);
+                                break;
+                            }
+                        }
+                    }
+                    sort(_perm + bState->pos + 1, _perm + _rackLen);
+                    cout << "  (sorted?) _perm: ";
+                    printTruncated(7);
+                    cout << "  incrementing blank" << endl;
+                    newestPrefixLen = bState->pos + 1;
+                    goto increment_blank;
+                }
+                if (skipUntilNewAt <= bState->pos) {
+                    cout << "    deleting blank" << endl;
+                    --activeBlanks;
+                }
+            }
         } else {
+	    // if permutation says to swap a letter before a blank, instead
+	    // advance the blank and reset to its first permutation
+            if (activeBlanks) {
+                bState = &bStates[activeBlanks - 1];
+                if (j < bState->pos) {
+                    cout << "  moving over blank (" << j << " < "
+                         << bState->pos << ")" << endl;
+                    if (++bState->idx < bState->lim) {
+                        cout << "    advancing blank" << endl;
+                        newestPrefixLen = bState->pos + 1;
+                        goto increment_blank;
+                    } else {
+                        cout << "    deleting blank" << endl;
+                        --activeBlanks;
+                    }
+                }
+            }
             // L3. [Increase a_j]
             increase(j);
             newestPrefixLen = j + 1;
@@ -341,7 +509,9 @@ void Anagrammer::anagram(const char *input) {
             for (int i = newestPrefixLen; i <= validChars; ++i) {
                 if (hasChild(_nodes[i - 1], _perm[i - 1])) {
                     uint child = getChild(_nodes[i - 1], _perm[i - 1]);
-                    if (terminates(child)) printTruncated(i);
+                    if (terminates(child)) {
+                        printTruncated(i, !inSmallerDict(child));
+                    }
                     unsigned int newNode = getPointer(child);
                     _nodes[i] = newNode;
                     if (!newNode) {

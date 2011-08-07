@@ -40,7 +40,14 @@ class Anagrammer
         uint64_t product;
         float value;
     };
-        
+
+    struct BlankState {
+        uint idx;
+        uint lim;
+        uint pos;
+        uchar ltr;
+    };
+
     uint _mask[32];
     const uint *_dawg;
     const uchar *_leaves;
@@ -70,9 +77,14 @@ class Anagrammer
 
     inline char toChar(unsigned int index);
     inline void printTruncated(int length);
+    inline void printTruncated(int length, bool octo);
     inline bool hasChild(uint nodeIndex, uchar c);
-    inline unsigned int getChild(uint nodeIndex, char c);
+    inline uint getChild(uint nodeIndex, char c);
+    inline uchar getChildLetter(uint nodeIndex, uint idx);
+    inline void printChildren(uint nodeIndex);
+    inline uint numChildren(uint nodeIndex);
     inline bool terminates(uint node);
+    inline bool inSmallerDict(uint node);
     inline unsigned int getPointer(uint node);
 
     inline leave_t* indexLeave(uint index);

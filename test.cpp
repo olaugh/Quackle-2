@@ -11,7 +11,7 @@
 using namespace std;
 
 void Test::testAnagram(const char *input, int times) {
-    Anagrammer a("twl");
+    Anagrammer a("csw");
     if (!a.isValid()) return;
     for (int i = 0; i < times; ++i) a.anagram(input);
 }
@@ -43,8 +43,8 @@ void Test::testRack() {
 void Test::testOpener() {
     Config standard("standard", "english");
     Board empty(15, 15, &standard);
-    uchar rucksexTiles[7] = {18, 21, 3, 11, 19, 5, 24}; //rucksex
-    //uchar rucksexTiles[7] = {18, 5, 20, 1, 9, 14, 19};  //retains
+    uchar rucksexTiles[7] = {18, 21, 3, BLANK, 19, 5, 24}; //ruc?sex
+    //uchar rucksexTiles[7] = {BLANK, 5, 20, 1, 9, 14, 19};  //?etains
     //uchar rucksexTiles[7] = {22, 9, 22, 9, 6, 9, 3}; //vivific
     Rack rucksex(7, rucksexTiles);
     Anagrammer a("twl");
