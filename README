@@ -8,3 +8,5 @@ I haven't planned very far ahead but I'm starting to think that it
 would be better to separate word-finding from strategy, and in the
 future I might write strategy code in Haskell or some other language,
 calling this library via FFI.
+
+I'm also using this to create DAWG files for my Android word game apps.
